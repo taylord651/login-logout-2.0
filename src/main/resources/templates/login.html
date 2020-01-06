@@ -12,12 +12,16 @@
 
     <form method = "post">
         <div>
-            <label for="username">Username</label>
-            <input type="text" id="username">
+            <label for="userName">Username</label>
+            <input type="text" id="userName" name="userName" th:value="${userName}">
+            <span th:text="${missing_username_error}" class="error"></span>
+            <span th:text="${invalid_username_error}" class="error"></span>
         </div>
         <div>
             <label for="password">Password</label>
-            <input type="password" id="password">
+            <input type="password" id="password" name="password">
+            <span th:text="${missing_password_error}" class="error"></span>
+            <span th:text="${incorrect_password_error}" class="error"></span>
         </div>
         <div>
             <input type="submit" value="Submit">

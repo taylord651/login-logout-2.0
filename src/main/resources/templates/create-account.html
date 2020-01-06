@@ -12,21 +12,24 @@
 
 <nav></nav>
 
-<form method = "post">
+<form method = "post" th:object="${user}">
     <div>
-        <label for="username">Username</label>
-        <input type="text" id="username">
+        <label th:for="userName">Username</label>
+        <input type="text" th:field="*{userName}"/>
+        <span th:text="${userName_error}" class="error"></span>
     </div>
     <div>
-        <label for="password">Password</label>
-        <input type="password" id="password">
+        <label th:for="password">Password</label>
+        <input type="password" th:field="*{password}"/>
+        <span th:text="${password_error}" class="error"></span>
     </div>
     <div>
         <label for="verify_password">Verify Password</label>
-        <input type="password" id="verify_password">
+        <input type="password" id="verify_password" name="verify_password"/>
+        <span th:text="${verify_password_error}" class="error"></span>
     </div>
     <div>
-        <input type="submit" value="Submit">
+        <input type="submit" value="Submit"/>
     </div>
 </form>
 

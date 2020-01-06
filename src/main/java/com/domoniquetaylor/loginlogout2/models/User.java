@@ -3,12 +3,10 @@ package com.domoniquetaylor.loginlogout2.models;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table
 public class User {
 
     @Id
@@ -16,19 +14,21 @@ public class User {
     private int id;
 
     @NotNull
-    @Size (min = 3, max = 30)
+    @Size
     private String userName;
 
     @NotNull
-    @Size (min = 3, max = 30)
+    @Size
     private String password;
 
     private String role = "user";
 
-    public User(String userName, String password, String role) {
+    public User(String userName, String password) {
         this.userName = userName;
         this.password = password;
     }
+
+    public User() {}
 
     public int getId() {
         return id;
