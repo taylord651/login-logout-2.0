@@ -8,17 +8,12 @@ import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 public class UserController {
@@ -27,9 +22,11 @@ public class UserController {
     UserDao userDao;
 
     @RequestMapping (value = "/")
-    public String index(Model model, User user) {
+    public String index(Model model, HttpSession session) {
 
-
+        if (session != null) {
+            model.addAttribute("username", session.getAttribute("username"));
+        }
         return "index";
     }
 
@@ -40,9 +37,10 @@ public class UserController {
 
     @RequestMapping (value = "/login", method = RequestMethod.POST)
     public String processLoginForm(Model model, @ModelAttribute @Valid User user,
-                                   Errors errors, @RequestParam String username,
-                                   String password, HttpServletRequest request,
-                                   HttpServletResponse response) throws ServletException, IOException {
+                                   @RequestParam String username,
+                                   String password, HttpServletRequest request) {
+
+        @SuppressWarnings("unchecked")
 
         User login_user = userDao.findByUsername(username);
 
@@ -65,15 +63,12 @@ public class UserController {
             return "/login";
         } else {
 
-            /*String destPage = "login.html";
-
             HttpSession session = request.getSession();
-            session.setAttribute("user", user);
+            session.setAttribute("username", username);
 
-            RequestDispatcher dispatcher = request.getRequestDispatcher(destPage);
-            dispatcher.forward(request, response);
-             */
-            return "redirect:/my-account/" + login_user.getId();
+            return "redirect:";
+
+            //return "redirect:/my-account/" + login_user.getId();
         }
     }
 
@@ -123,30 +118,10 @@ public class UserController {
         }
     }
 
-    @RequestMapping (value = "/logout" , method = RequestMethod.GET)
-    public String logout() {
 
+    @RequestMapping (value = "/logout")
+    public String logout(HttpServletRequest request, HttpSession session) {
+        session.invalidate();
         return "redirect:";
     }
-
-    @WebServlet("/logout")
-    public class userLogoutServlet extends HttpServlet {
-        private static final long serialVersionUID = 1L;
-
-        public userLogoutServlet() {
-            super();
         }
-
-        protected void doGet(HttpServletRequest request, HttpServletResponse response)
-                throws ServletException, IOException {
-            HttpSession session = request.getSession(false);
-            if (session != null) {
-                session.removeAttribute("user");
-
-                RequestDispatcher dispatcher = request.getRequestDispatcher("login.jsp");
-                dispatcher.forward(request, response);
-            }
-        }
-
-    }
-}
