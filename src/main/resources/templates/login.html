@@ -8,12 +8,12 @@
     <h1>Login</h1>
 
     <a href="/">Home</a> |
-    <a href="/create-account">Create Account</a>
+    <a href="/create-account">Create Account</a> |
 
     <form method = "post">
         <div>
-            <label for="userName">Username</label>
-            <input type="text" id="userName" name="userName" th:value="${userName}">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" th:value="${username}">
             <span th:text="${missing_username_error}" class="error"></span>
             <span th:text="${invalid_username_error}" class="error"></span>
         </div>

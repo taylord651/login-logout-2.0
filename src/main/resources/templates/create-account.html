@@ -14,9 +14,9 @@
 
 <form method = "post" th:object="${user}">
     <div>
-        <label th:for="userName">Username</label>
-        <input type="text" th:field="*{userName}"/>
-        <span th:text="${userName_error}" class="error"></span>
+        <label th:for="username">Username</label>
+        <input type="text" th:field="*{username}"/>
+        <span th:text="${username_error}" class="error"></span>
     </div>
     <div>
         <label th:for="password">Password</label>

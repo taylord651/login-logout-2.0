@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -30,9 +27,8 @@ public class UserController {
     UserDao userDao;
 
     @RequestMapping (value = "/")
-    public String index(Model model) {
+    public String index(Model model, User user) {
 
-        model.addAttribute("userName");
 
         return "index";
     }
@@ -44,11 +40,13 @@ public class UserController {
 
     @RequestMapping (value = "/login", method = RequestMethod.POST)
     public String processLoginForm(Model model, @ModelAttribute @Valid User user,
-                                   Errors errors, @RequestParam String userName, String password) {
+                                   Errors errors, @RequestParam String username,
+                                   String password, HttpServletRequest request,
+                                   HttpServletResponse response) throws ServletException, IOException {
 
-        User login_user = userDao.findByUserName(userName);
+        User login_user = userDao.findByUsername(username);
 
-        boolean valid_username = userName.length() > 3;
+        boolean valid_username = username.length() > 3;
         boolean valid_password = password.length() > 3;
         boolean verified_user = login_user != null;
 
@@ -62,49 +60,34 @@ public class UserController {
             } if (!valid_password) {
                 model.addAttribute("missing_password_error", "Password required");
             }
-            model.addAttribute("userName", userName);
+            model.addAttribute("username", username);
             model.addAttribute("title", "Login");
             return "/login";
         } else {
-            return index(model.addAttribute("userName", userName));
+
+            /*String destPage = "login.html";
+
+            HttpSession session = request.getSession();
+            session.setAttribute("user", user);
+
+            RequestDispatcher dispatcher = request.getRequestDispatcher(destPage);
+            dispatcher.forward(request, response);
+             */
+            return "redirect:/my-account/" + login_user.getId();
         }
     }
 
-   /* @WebServlet("/login")
-    public class UserLoginServlet extends HttpServlet {
-        private static final long serialVersionUID = 1L;
+   @RequestMapping (value = "my-account/{userId}", method = RequestMethod.GET)
+   public String displayMySchools(Model model, @PathVariable int userId) {
 
-        public UserLoginServlet() {
-            super();
-        }
+       User user = userDao.findById(userId);
 
-        protected void doPost(HttpServletRequest request, HttpServletResponse response)
-                throws ServletException, IOException {
-            String userName = request.getParameter("userName");
-            String password = request.getParameter("password");
+       model.addAttribute("title", "My Account: " + user.getUsername());
+       model.addAttribute("user", user);
 
-            try {
-                User user = userDao.checkLogin(userName, password);
-                String destPage = "login.jsp";
+       return "my-account";
 
-                if (user != null) {
-                    HttpSession session = request.getSession();
-                    session.setAttribute("user", user);
-                    destPage = "home.jsp";
-                } else {
-                    String message = "Invalid userName/password";
-                    request.setAttribute("message", message);
-                }
-
-                RequestDispatcher dispatcher = request.getRequestDispatcher(destPage);
-                dispatcher.forward(request, response);
-
-            } catch (SQLException | ClassNotFoundException ex) {
-                throw new ServletException(ex);
-            }
-        }
-
-    */
+   }
 
     @RequestMapping (value = "/create-account", method = RequestMethod.GET)
     public String displayCreateAccountForm(Model model) {
@@ -115,17 +98,17 @@ public class UserController {
     }
 
     @RequestMapping (value = "/create-account", method = RequestMethod.POST)
-    public String processCreateAccountForm(Model model, @ModelAttribute @Valid User newUser, String userName,
+    public String processCreateAccountForm(Model model, @ModelAttribute @Valid User newUser, String username,
                                            String password, String verify_password, Errors errors) {
 
-        boolean valid_userName = userName.length() > 3 && userName.length() < 30;
+        boolean valid_username = username.length() > 3 && username.length() < 30;
         boolean valid_password = password.length() > 3 && password.length() < 30;
         boolean valid_verify_password = password.equals(verify_password);
 
-        if (valid_userName == false || valid_password == false || valid_verify_password == false) {
-            if (!valid_userName) {
-                model.addAttribute("userName_error", "Username must be between 3 and 30 characters");
-                model.addAttribute("userName", userName);
+        if (valid_username == false || valid_password == false || valid_verify_password == false) {
+            if (!valid_username) {
+                model.addAttribute("username_error", "Username must be between 3 and 30 characters");
+                model.addAttribute("username", username);
             }
             if (!valid_password) {
                 model.addAttribute("password_error", "Password must be between 3 and 30 characters");
